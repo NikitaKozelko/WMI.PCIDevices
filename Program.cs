@@ -8,14 +8,15 @@ namespace WMI.PCIDevices
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            PCIDevices devices = new PCIDevices();
-            foreach (var device in devices.findDevices())
+            PciDevices devices = new PciDevices();
+            foreach (var device in devices.FindDevices())
             {
-                Console.WriteLine("VendorID: {0} , DeviceID {1}", device.getVendorID(), device.getDeviceID());
+                Console.WriteLine("VendorID: {0} , DeviceID {1}", device.GetVendorId(), device.GetDeviceId());
             }
             Console.ReadKey();
+
         }
     }
 }

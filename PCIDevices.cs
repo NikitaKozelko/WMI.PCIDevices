@@ -1,37 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Management;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 
 namespace WMI.PCIDevices
 {
-    class PCIDevices 
+    class PciDevices
     {
 
-        Regex deviceID;
-        Regex vendorID;
-        ManagementObjectSearcher PCIDeviceList;
+        private readonly Regex _deviceId;
+        private readonly Regex _vendorId;
+        private readonly ManagementObjectSearcher _pciDeviceList;
 
-        public PCIDevices()
+        public PciDevices()
         {
-            deviceID = new Regex("DEV_.{4}");
-            vendorID = new Regex("VEN_.{4}");
-            PCIDeviceList = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PnPEntity WHERE DeviceID LIKE 'PCI%'");
+            _deviceId = new Regex("DEV_.{4}");
+            _vendorId = new Regex("VEN_.{4}");
+            _pciDeviceList = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_PnPEntity WHERE DeviceID LIKE 'PCI%'");
         }
 
-        public List<DeviceInfo> findDevices()
+        public List<DeviceInfo> FindDevices()
         {
             List<DeviceInfo> listDeviceInfo = new List<DeviceInfo>();
 
-            foreach (var item in PCIDeviceList.Get())
+            foreach (var item in _pciDeviceList.Get())
             {
                 var info = item["DeviceID"].ToString();
-                var deviceIDTemp = deviceID.Match(info).Value.Substring(4).ToLower();
-                var vendorIDTemp = vendorID.Match(info).Value.Substring(4).ToLower();
-                DeviceInfo deviceInfo = DataFinder(deviceIDTemp, vendorIDTemp);
+                var deviceIdTemp = _deviceId.Match(info).Value.Substring(4).ToLower();
+                var vendorIdTemp = _vendorId.Match(info).Value.Substring(4).ToLower();
+                DeviceInfo deviceInfo = DataFinder(deviceIdTemp, vendorIdTemp);
                 if (deviceInfo != null)
                 {
                     listDeviceInfo.Add(deviceInfo);
@@ -43,18 +41,18 @@ namespace WMI.PCIDevices
 
         private DeviceInfo DataFinder(string dev, string ven)
         {
-            var filePCI = new StreamReader("pci_ids.txt");
+            var filePci = new StreamReader("pci_ids.txt");
             var vendor = new Regex("^" + ven + "  ");
             var device = new Regex("^\\t" + dev + "  ");
 
-            while (!filePCI.EndOfStream)
+            while (!filePci.EndOfStream)
             {
-                var vendorText = filePCI.ReadLine();
+                var vendorText = filePci.ReadLine();
                 if (vendorText != null && vendor.Match(vendorText).Success)
                 {
-                    while (!filePCI.EndOfStream)
+                    while (!filePci.EndOfStream)
                     {
-                        var deviceText = filePCI.ReadLine();
+                        var deviceText = filePci.ReadLine();
                         if (deviceText == null || !device.Match(deviceText).Success)
                             continue;
                         return new DeviceInfo(deviceText.Substring(7), vendorText.Substring(6));

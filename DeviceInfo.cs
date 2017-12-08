@@ -8,23 +8,25 @@ namespace WMI.PCIDevices
 {
     class DeviceInfo
     {
-        private string DeviceID;
-        private string VendorID;
 
-        public DeviceInfo(string deviceID, string vendorID)
+        private readonly string _deviceId;
+        private readonly string _vendorId;
+
+        public DeviceInfo(string deviceId, string vendorId)
         {
-            DeviceID = deviceID;
-            VendorID = vendorID;
+            _deviceId = deviceId;
+            _vendorId = vendorId;
+
         }
 
-        public string getDeviceID()
+        public string GetDeviceId()
         {
-            return DeviceID;
+            return _deviceId;
         }
 
-        public string getVendorID()
+        public string GetVendorId()
         {
-            return VendorID;
+            return _vendorId;
         }
     }
 }
